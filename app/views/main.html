@@ -1,0 +1,15 @@
+<input ng-model="sliderValue"  type="text" id="mySlider1" slider options="sliderOptions" />
+
+<br/>
+Low: {{userRange.min}}<br/>
+High: {{userRange.max}}
+<br/>
+
+<ul>
+  <li ng-repeat="stock in stocksProvider.results">
+    {{stock.Symbol}}<br/>
+    Low: {{stock.YearLow}}<br/>
+    High: {{stock.YearHigh}}<br/>
+    In Range? {{stock.inRange}}
+  </li>
+</ul>
