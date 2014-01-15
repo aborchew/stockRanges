@@ -1,15 +1,43 @@
-<input ng-model="sliderValue"  type="text" id="mySlider1" slider options="sliderOptions" />
+<h3>Find a stock</h3>
+<p>Drag the sliders to find a stock that has been in your desired price range over the last year.</p>
 
 <br/>
-Low: {{userRange.min}}<br/>
-High: {{userRange.max}}
+
+<div id="sliderContainer"></div>
+
 <br/>
 
-<ul>
-  <li ng-repeat="stock in stocksProvider.results">
-    {{stock.Symbol}}<br/>
-    Low: {{stock.YearLow}}<br/>
-    High: {{stock.YearHigh}}<br/>
-    In Range? {{stock.inRange}}
-  </li>
-</ul>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Stocks in Range <strong class="text-primary pull-right">${{userRange.min}} - ${{userRange.max}}</strong></h3>
+  </div>
+  <div class="panel-body" ng-show="filteredStocks().length == 0">
+    <h5 class="text-danger">There are no stocks in the selected range.</h5>
+  </div>
+  <ul class="list-group" ng-show="filteredStocks().length > 0">
+    <li
+      ng-repeat="stock in filteredStocks()"
+      ng-show="stock.inRange"
+      class="list-group-item"
+    >
+      <h4>{{stock.Name}}</h4>
+      <strong class="text-info">{{stock.Symbol}}</strong>
+      <em class="text-muted">2013 Low: ${{stock.YearLow}}&nbsp;|</em>
+      <em class="text-muted">2013 High: ${{stock.YearHigh}}</em>
+    </li>
+  </ul>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">Stocks Being Tracked</div>
+  <div class="panel-body">
+    <span class="label label-primary pull-left" style="margin:5px 5px 0 0;" ng-repeat="stock in stocksProvider.getResults()">{{stock.Symbol}}<!-- &nbsp;<span class="glyphicon glyphicon-remove" ng-click="stocksProvider.symbols.remove(stock.Symbol)"></span> --></span>
+  </div>
+</div>
+
+<!-- <div class="panel panel-default">
+  <div class="panel-heading">Add more Stocks</div>
+  <div class="panel-body">
+    <span class="label label-success" style="margin-right:5px;" ng-repeat="stock in availableStocks">{{stock.Symbol}}&nbsp;<span class="glyphicon glyphicon-plus"></span ng-click="stocksProvider.update(stock.Symbol)"></span>
+  </div>
+</div> -->

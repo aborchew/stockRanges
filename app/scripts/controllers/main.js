@@ -1,14 +1,18 @@
 'use strict';
 
 angular.module('rangesApp')
-  .controller('MainCtrl', function ($scope, $filter, $timeout, Stocks) {
+  .controller('MainCtrl', function ($scope, $filter, $timeout, $compile, Stocks) {
 
     $scope.stocksProvider = Stocks;
+    $scope.userRange = {
+      min: 0,
+      max: 10000
+    }
 
     $scope.getRange = function (f) {
       var r = [];
-      angular.forEach($scope.stocksProvider.results, function (stock) {
-        r.push(parseFloat(stock[f]));
+      angular.forEach($scope.stocksProvider.getResults(), function (stock) {
+        r.push(stock[f]);
       })
       r.sort(function (a,b) {
         return a - b;
@@ -16,7 +20,7 @@ angular.module('rangesApp')
       return r;
     }
 
-    $scope.updateFilteredStocks = function () {
+    $scope.filteredStocks = function () {
 
       function isInRange (num) {
         if(num >= $scope.userRange.min && num <= $scope.userRange.max) {
@@ -25,34 +29,34 @@ angular.module('rangesApp')
         return false;
       }
 
-      $scope.filteredStocks = function () {
-        var f = $filter('filter')($scope.stocksProvider.results, function (stock) {
-          if(isInRange(stock.YearLow) || isInRange(stock.YearHigh)) {
-            stock.inRange = true;
-            return true;
-          } else {
-            stock.inRange = false;
-            return false;
-          }
-        })
-        return f;
+      var f = $filter('filter')($scope.stocksProvider.getResults(), function (stock) {
+        if(isInRange(stock.YearLow) || isInRange(stock.YearHigh)) {
+          stock.inRange = true;
+          return true;
+        } else {
+          stock.inRange = false;
+          return false;
+        }
+      })
+
+      return f;
+    }
+
+    $scope.generateRanges = function () {
+
+      $scope.stockRange = {
+        min: $scope.getRange('YearLow')[0],
+        max: $scope.getRange('YearHigh')[$scope.getRange('YearHigh').length-1]
       }
-      console.log($scope.filteredStocks());
-    }
 
-    $scope.userRange = {}
+      $scope.sliderValue = '0;' + $scope.stockRange.max
+      $scope.sliderOptions = {
+        from: 0,
+        to: $scope.stockRange.max,
+        step: .1,
+        dimension: " $"
+      };
 
-    $scope.stockRange = {
-      min: $scope.getRange('YearLow')[0],
-      max: $scope.getRange('YearHigh')[$scope.getRange('YearHigh').length-1]
-    }
-
-    $scope.sliderValue = '120;900'
-    $scope.sliderOptions = {
-      from: 0,
-      to: $scope.stockRange.max + 10,
-      step: .1,
-      dimension: " $"
     };
 
     $scope.$watch(function () {
@@ -60,9 +64,18 @@ angular.module('rangesApp')
     }, function (n,o) {
       $scope.userRange.min = n.split(';')[0]
       $scope.userRange.max = n.split(';')[1]
-      $scope.updateFilteredStocks();
     },true)
 
-    $scope.updateFilteredStocks();
+    $scope.$watch(function () {
+      return $scope.stocksProvider.getResults();
+    }, function (n,o) {
+      if(!o || n.length != o.length) {
+        $scope.generateRanges();
+        $('#sliderContainer').html('')
+        $('#sliderContainer').html($compile('<input ng-model="sliderValue"  type="text" id="slider" slider options="sliderOptions" />')($scope));
+      };
+    }, true);
+
+    $scope.generateRanges();
 
   });

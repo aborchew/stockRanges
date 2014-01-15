@@ -7,8 +7,7 @@ angular.module('rangesApp')
       return '"' + stockSymbols.join('","') + '"';
     }
 
-    var stockSymbols = ["GOOG","MSFT"]
-      , yahooURI = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20(' + generateParams(stockSymbols) + ')&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback='
+    var stockSymbols = ["GOOG","MSFT","F","BAC","AMD","JPM","EMC","WFC","JCP","GE","GME","T","S","NVR","MA","GHC","V","MKL"]
       , responseData = {
         "query": {
           "count": 2,
@@ -52,13 +51,21 @@ angular.module('rangesApp')
           }
         }
       }
-      , stockData = responseData.query.results.quote;
+      , stockData = responseData.query.results.quote
+      ;
+
+    function yahooURI () {
+      return 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quote%20where%20symbol%20in%20(' + generateParams(stockSymbols) + ')&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback='
+    }
 
     function updateStocks () {
       var deferred = $q.defer();
-      $http({method: 'GET', url: yahooURI}).
+      $http({method: 'GET', url: yahooURI()}).
         success(function(data, status, headers, config) {
           if(data && data.query && data.query.results && data.query.results.quote) {
+            if(!data.query.results.quote.length) {
+              data.query.results.quote = [data.query.results.quote];
+            }
             angular.forEach(data.query.results.quote, function (stock,ind) {
               if(!stock.YearLow || !stock.YearHigh) {
                 data.query.results.quote.splice(ind,1);
@@ -68,7 +75,7 @@ angular.module('rangesApp')
                 stock.YearHigh = parseFloat(stock.YearHigh);
               }
             })
-            stockData = data;
+            stockData = data.query.results.quote;
             deferred.resolve();
           } else {
             deferred.reject();
@@ -102,12 +109,12 @@ angular.module('rangesApp')
           if(typeof symbol === 'string' && stockSymbols.indexOf(symbol) != -1) {
             stockSymbols.splice(stockSymbols.indexOf(symbol),1);
           }
-          return stockSymbols;
+          return updateStocks();
         }
       },
-      results: function () {
+      getResults: function () {
         return stockData;
-      }()
+      }
     }
 
   });

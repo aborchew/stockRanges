@@ -17,9 +17,9 @@ describe('Service: Stocks', function () {
 
   describe('by default when loaded', function () {
 
-    it('should have 2 stocks available with some historical data', function () {
+    it('should have 2 stocks available with some dummy historical data', function () {
 
-      expect(Stocks.results.length).toBe(2);
+      expect(Stocks.getResults().length).toBe(2);
 
     });
 
@@ -43,36 +43,27 @@ describe('Service: Stocks', function () {
 
     it('Should add symbols to the array', function () {
 
-      expect(Stocks.symbols.get()).toEqual(['GOOG','MSFT']);
+      expect(Stocks.symbols.get().length).toBeGreaterThan(0);
 
-      Stocks.update(['F','YHOO']);
+      Stocks.update(['YHOO']);
 
-      expect(Stocks.symbols.get()).toEqual(['GOOG','MSFT','F','YHOO']);
+      expect(Stocks.symbols.get().indexOf('YHOO')).not.toEqual(-1);
 
     })
 
     it('Should remove symbols from the array', function () {
 
-      expect(Stocks.symbols.get()).toEqual(['GOOG','MSFT']);
+      var symbolsLength = Stocks.symbols.get().length;
+
+      expect(Stocks.symbols.get().length).toBeGreaterThan(0);
 
       Stocks.symbols.remove('MSFT');
 
-      expect(Stocks.symbols.get()).toEqual(['GOOG']);
+      expect(Stocks.symbols.get().length).toEqual(symbolsLength-1);
 
       Stocks.symbols.remove('GOOG');
 
-      expect(Stocks.symbols.get()).toEqual([]);
-
-    })
-
-  })
-
-  describe('Calculations based on default stocks', function () {
-
-    it('Should correctly calculate the minimum and maximum stock values', function () {
-
-      expect(Stocks.range.min).toEqual(26.83);
-      expect(Stocks.range.max).toEqual(1147.3199);
+      expect(Stocks.symbols.get().length).toEqual(symbolsLength-2);
 
     })
 
