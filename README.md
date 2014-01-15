@@ -6,7 +6,6 @@ http://rubyquiz.strd6.com/quizzes/164-price-ranges
 
 
 ### Frameworks
-
  - Jasmine
  - Karma
  - Angular.js
