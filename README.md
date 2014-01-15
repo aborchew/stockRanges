@@ -19,3 +19,4 @@ http://aborchew.github.io/stockRanges/
  - Grunt
  - jQuery
      - ngSlider from https://travis-ci.org/darul75/ng-slider
+ - Twitter Bootstrap
